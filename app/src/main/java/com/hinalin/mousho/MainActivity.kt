@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,6 +39,11 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
+import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 
 class MainActivity : ComponentActivity() {
 
@@ -86,7 +93,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    BatteryTemperatureScreen(batteryMonitor)
+                    MainScreen(batteryMonitor)
                 }
             }
         }
@@ -106,7 +113,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BatteryTemperatureScreen(batteryMonitor: BatteryTemperatureMonitor) {
+fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
     var isOverheated by remember { mutableStateOf(batteryMonitor.isOverheated) }
     var currentTemperature by remember { mutableStateOf(batteryMonitor.currentTemperature) }
 
@@ -133,6 +140,9 @@ fun BatteryTemperatureScreen(batteryMonitor: BatteryTemperatureMonitor) {
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
+        },
+        bottomBar = {
+            BottomNavigationBar()
         }
     ) { innerPadding ->
         Column(
@@ -144,6 +154,24 @@ fun BatteryTemperatureScreen(batteryMonitor: BatteryTemperatureMonitor) {
         ) {
             LottieAnimationView(isOverheated = isOverheated)
             BatteryTemperatureDisplay(temperature = currentTemperature)
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar() {
+    var selectedItem by remember { mutableStateOf(0) }
+    val items = listOf("Home", "Record", "Settings")
+    val icons = listOf(Icons.Filled.Home, Icons.Filled.List, Icons.Filled.Settings)
+
+    NavigationBar {
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                icon = { Icon(icons[index], contentDescription = item) },
+                label = { Text(item) },
+                selected = selectedItem == index,
+                onClick = { selectedItem = index }
+            )
         }
     }
 }
