@@ -1,6 +1,6 @@
 package com.hinalin.mousho
 
-import NotificationHelper
+import com.hinalin.mousho.notification.NotificationHelper
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -32,6 +32,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.hinalin.mousho.ui.composables.LottieAnimationView
 import com.hinalin.mousho.ui.theme.MoushoTheme
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
 
@@ -62,6 +67,18 @@ class MainActivity : ComponentActivity() {
 
         notificationHelper = NotificationHelper(this)
         batteryMonitor = BatteryTemperatureMonitor(this)
+
+        val updateRequest = PeriodicWorkRequestBuilder<BatteryTemperatureUpdateWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(Constraints.Builder()
+                .setRequiresBatteryNotLow(true)
+                .build())
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "BatteryTemperatureUpdate",
+            ExistingPeriodicWorkPolicy.KEEP,
+            updateRequest
+        )
 
         setContent {
             MoushoTheme {

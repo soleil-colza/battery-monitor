@@ -1,3 +1,5 @@
+package com.hinalin.mousho.notification
+
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -48,7 +50,6 @@ class NotificationHelper(private val context: Context) {
         ) {
             notificationManager.notify(notificationId, builder.build())
         } else {
-            // Log or handle the case where permission is not granted
             Log.w("NotificationHelper", "Notification permission not granted")
         }
     }
