@@ -9,23 +9,30 @@ import android.util.Log
 
 class BatteryTemperatureMonitor(context: Context) {
 
-    var isOverheating: Boolean = false
+    var isOverheated: Boolean = false
         private set
 
-    var onOverheatingChanged: ((Boolean) -> Unit)? = null
+    var currentTemperature: Float = 0f
+        private set
+
+    var onTemperatureChanged: ((Float) -> Unit)? = null
+
+    var onOverheatedChanged: ((Boolean, Float) -> Unit)? = null
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            // バッテリー温度を取得 (温度は℃x10の値で返される)
             val batteryTemperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
-            val wasOverheating = isOverheating
-            isOverheating = batteryTemperature > 40.0f
+            val wasOverheated = isOverheated
+            isOverheated = batteryTemperature > 40.0f
+            currentTemperature = batteryTemperature
 
-            if (isOverheating != wasOverheating) {
-                onOverheatingChanged?.invoke(isOverheating)
+            onTemperatureChanged?.invoke(currentTemperature)
+
+            if (isOverheated != wasOverheated) {
+                onOverheatedChanged?.invoke(isOverheated, currentTemperature)
             }
 
-            Log.d("BatteryTemperatureMonitor", "Battery temperature: $batteryTemperature°C, Overheating: $isOverheating")
+            Log.d("BatteryTemperatureMonitor", "Battery temperature: $currentTemperature°C, Overheated: $isOverheated")
         }
     }
 
