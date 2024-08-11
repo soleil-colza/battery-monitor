@@ -5,7 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import com.hinalin.mousho.data.model.OverheatEvent
+import java.time.LocalDateTime
 
 class BatteryTemperatureMonitor(context: Context) {
 
@@ -19,6 +23,14 @@ class BatteryTemperatureMonitor(context: Context) {
 
     var onOverheatedChanged: ((Boolean, Float) -> Unit)? = null
 
+    private val overheatEvents = mutableListOf<OverheatEvent>()
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getOverheatEvents(): List<OverheatEvent> {
+        val twentyFourHoursAgo = LocalDateTime.now().minusHours(24)
+        return overheatEvents.filter { it.timestamp.isAfter(twentyFourHoursAgo) }
+    }
+
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val batteryTemperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
@@ -28,7 +40,8 @@ class BatteryTemperatureMonitor(context: Context) {
 
             onTemperatureChanged?.invoke(currentTemperature)
 
-            if (isOverheated != wasOverheated) {
+            if (isOverheated && !wasOverheated) {
+                overheatEvents.add(OverheatEvent(LocalDateTime.now(), currentTemperature))
                 onOverheatedChanged?.invoke(isOverheated, currentTemperature)
             }
 
