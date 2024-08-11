@@ -13,9 +13,9 @@ class BatteryTemperatureUpdateWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        val glanceId = GlanceAppWidgetManager(applicationContext).getGlanceIds(BatteryTemperatureWidget::class.java).firstOrNull()
+        val glanceIds = GlanceAppWidgetManager(applicationContext).getGlanceIds(BatteryTemperatureWidget::class.java)
         
-        glanceId?.let { id ->
+        glanceIds.forEach { id ->
             BatteryTemperatureWidget().update(applicationContext, id)
         }
 

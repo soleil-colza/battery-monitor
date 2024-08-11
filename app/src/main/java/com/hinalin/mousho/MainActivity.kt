@@ -2,16 +2,19 @@ package com.hinalin.mousho
 
 import com.hinalin.mousho.notification.NotificationHelper
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +45,25 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.setValue
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
+import androidx.lifecycle.lifecycleScope
+import com.hinalin.mousho.ui.screens.SettingScreen
+import kotlinx.coroutines.launch
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+private val NOTIFICATION_ENABLED = booleanPreferencesKey("notification_enabled")
+private val OVERHEAT_THRESHOLD = floatPreferencesKey("overheat_threshold")
 
 class MainActivity : ComponentActivity() {
 
@@ -66,9 +86,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         checkNotificationPermission()
 
@@ -87,6 +107,14 @@ class MainActivity : ComponentActivity() {
             updateRequest
         )
 
+        lifecycleScope.launch {
+            dataStore.data.map { preferences ->
+                preferences[OVERHEAT_THRESHOLD] ?: 40f
+            }.collect { threshold ->
+                batteryMonitor.overheatThreshold = threshold
+            }
+        }
+
         setContent {
             MoushoTheme {
                 Surface(
@@ -100,7 +128,14 @@ class MainActivity : ComponentActivity() {
 
         batteryMonitor.onOverheatedChanged = { isOverheated, temperature ->
             if (isOverheated) {
-                notificationHelper.showOverheatNotification()
+                runBlocking {
+                    val notificationEnabled = dataStore.data.map { preferences ->
+                        preferences[NOTIFICATION_ENABLED] ?: true
+                    }.first()
+                    if (notificationEnabled) {
+                        notificationHelper.showOverheatNotification()
+                    }
+                }
             }
         }
     }
@@ -111,18 +146,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
     var isOverheated by remember { mutableStateOf(batteryMonitor.isOverheated) }
     var currentTemperature by remember { mutableStateOf(batteryMonitor.currentTemperature) }
+    var currentScreen by remember { mutableStateOf(0) }
 
     batteryMonitor.onOverheatedChanged = { newIsOverheated, temperature ->
         isOverheated = newIsOverheated
-        currentTemperature = temperature
-    }
-
-    batteryMonitor.onTemperatureChanged = { temperature ->
         currentTemperature = temperature
     }
 
@@ -131,8 +164,13 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = if (isOverheated) "Burning out!🔋" else "Comfy！🔋",
-                        style = MaterialTheme.typography.headlineMedium
+                        text = when (currentScreen) {
+                            0 -> if (isOverheated) "Burning hot!" else "Comfy!"
+                            1 -> "Today's Overheat Events"
+                            2 -> "Settings"
+                            else -> "Battery Monitor"
+                        },
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -142,7 +180,21 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
             )
         },
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(currentScreen) { screen ->
+                currentScreen = screen
+            }
+        },
+        floatingActionButton = {
+            if (currentScreen == 0) {
+                FloatingActionButton(
+                    onClick = {
+                        currentTemperature = batteryMonitor.getCurrentBatteryTemperature()
+                        isOverheated = currentTemperature > batteryMonitor.overheatThreshold
+                    }
+                ) {
+                    Icon(Icons.Filled.Refresh, contentDescription = "Update temperature")
+                }
+            }
         }
     ) { innerPadding ->
         Column(
@@ -150,18 +202,23 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
                 .fillMaxSize()
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            LottieAnimationView(isOverheated = isOverheated)
-            BatteryTemperatureDisplay(temperature = currentTemperature)
+            when (currentScreen) {
+                0 -> {
+                    LottieAnimationView(isOverheated = isOverheated)
+                    BatteryTemperatureDisplay(temperature = currentTemperature)
+                }
+                1 -> RecordScreen(batteryMonitor)
+                2 -> SettingScreen()
+            }
         }
     }
 }
 
+
 @Composable
-fun BottomNavigationBar() {
-    var selectedItem by remember { mutableStateOf(0) }
-    val items = listOf("Home", "Record", "Settings")
+fun BottomNavigationBar(currentScreen: Int, onScreenChange: (Int) -> Unit) {
+    val items = listOf("Home", "Record", "Setting")
     val icons = listOf(Icons.Filled.Home, Icons.Filled.List, Icons.Filled.Settings)
 
     NavigationBar {
@@ -169,8 +226,8 @@ fun BottomNavigationBar() {
             NavigationBarItem(
                 icon = { Icon(icons[index], contentDescription = item) },
                 label = { Text(item) },
-                selected = selectedItem == index,
-                onClick = { selectedItem = index }
+                selected = currentScreen == index,
+                onClick = { onScreenChange(index) }
             )
         }
     }
@@ -178,10 +235,29 @@ fun BottomNavigationBar() {
 
 @Composable
 fun BatteryTemperatureDisplay(temperature: Float) {
-    Text(
-        text = "Current Battery Temperature: ${String.format("%.1f", temperature)}°C",
-        style = MaterialTheme.typography.bodyLarge,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.padding(top = 16.dp)
-    )
+    ElevatedCard(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(), // Adjusted to only fill the width
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp), // Add padding to the content within the card
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center // Center content vertically
+        ) {
+            Text(
+                text = "Current Battery Temperature",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "${String.format("%.1f", temperature)}°C",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
