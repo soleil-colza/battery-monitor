@@ -2,22 +2,18 @@ package com.hinalin.mousho
 
 import com.hinalin.mousho.notification.NotificationHelper
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,8 +45,25 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.setValue
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
+import androidx.lifecycle.lifecycleScope
+import com.hinalin.mousho.ui.screens.SettingScreen
+import kotlinx.coroutines.launch
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+private val NOTIFICATION_ENABLED = booleanPreferencesKey("notification_enabled")
+private val OVERHEAT_THRESHOLD = floatPreferencesKey("overheat_threshold")
 
 class MainActivity : ComponentActivity() {
 
@@ -73,9 +86,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         checkNotificationPermission()
 
@@ -94,6 +107,14 @@ class MainActivity : ComponentActivity() {
             updateRequest
         )
 
+        lifecycleScope.launch {
+            dataStore.data.map { preferences ->
+                preferences[OVERHEAT_THRESHOLD] ?: 40f
+            }.collect { threshold ->
+                batteryMonitor.overheatThreshold = threshold
+            }
+        }
+
         setContent {
             MoushoTheme {
                 Surface(
@@ -107,7 +128,14 @@ class MainActivity : ComponentActivity() {
 
         batteryMonitor.onOverheatedChanged = { isOverheated, temperature ->
             if (isOverheated) {
-                notificationHelper.showOverheatNotification()
+                runBlocking {
+                    val notificationEnabled = dataStore.data.map { preferences ->
+                        preferences[NOTIFICATION_ENABLED] ?: true
+                    }.first()
+                    if (notificationEnabled) {
+                        notificationHelper.showOverheatNotification()
+                    }
+                }
             }
         }
     }
@@ -131,17 +159,18 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
         currentTemperature = temperature
     }
 
-    batteryMonitor.onTemperatureChanged = { temperature ->
-        currentTemperature = temperature
-    }
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = if (isOverheated) "Burning out!🔋" else "Comfy！🔋",
-                        style = MaterialTheme.typography.headlineMedium
+                        text = when (currentScreen) {
+                            0 -> if (isOverheated) "Burning hot!" else "Comfy!"
+                            1 -> "Today's Overheat Events"
+                            2 -> "Settings"
+                            else -> "Battery Monitor"
+                        },
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -154,11 +183,23 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
             BottomNavigationBar(currentScreen) { screen ->
                 currentScreen = screen
             }
+        },
+        floatingActionButton = {
+            if (currentScreen == 0) {
+                FloatingActionButton(
+                    onClick = {
+                        currentTemperature = batteryMonitor.getCurrentBatteryTemperature()
+                        isOverheated = currentTemperature > batteryMonitor.overheatThreshold
+                    }
+                ) {
+                    Icon(Icons.Filled.Refresh, contentDescription = "Update temperature")
+                }
+            }
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize() // Columnが画面全体を占めるようにする
+                .fillMaxSize()
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -166,10 +207,9 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
                 0 -> {
                     LottieAnimationView(isOverheated = isOverheated)
                     BatteryTemperatureDisplay(temperature = currentTemperature)
-                    Spacer(modifier = Modifier.height(16.dp)) // ここで隙間を追加
                 }
                 1 -> RecordScreen(batteryMonitor)
-                2 -> Text("設定画面")
+                2 -> SettingScreen()
             }
         }
     }
@@ -197,30 +237,27 @@ fun BottomNavigationBar(currentScreen: Int, onScreenChange: (Int) -> Unit) {
 fun BatteryTemperatureDisplay(temperature: Float) {
     ElevatedCard(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(16.dp)
+            .fillMaxWidth(), // Adjusted to only fill the width
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
+                .fillMaxWidth()
+                .padding(16.dp), // Add padding to the content within the card
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.Center // Center content vertically
         ) {
             Text(
                 text = "Current Battery Temperature",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
             )
             Text(
                 text = "${String.format("%.1f", temperature)}°C",
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.size(16.dp)) // Textの下にさらにスペースを追加
         }
     }
 }
