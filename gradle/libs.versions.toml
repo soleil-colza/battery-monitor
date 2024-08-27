@@ -10,12 +10,13 @@ espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
 composeBom = "2024.06.00"
-lottieCompose = "6.4.1"
-work-runtime = "2.9.0"
+lottieCompose = "6.5.0"
+work-runtime = "2.9.1"
+lottieCompose = "6.5.0"
 firebase-bom = "33.1.2"
 google-services = "4.4.2"
-firebase-appdistribution = "3.0.1"
 ktlint = "12.1.1"
+firebase-appdistribution = "5.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
