@@ -24,32 +24,37 @@ class BatteryTemperatureMonitor(private val context: Context) {
 
     private val overheatEvents = mutableListOf<OverheatEvent>()
 
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_BATTERY_CHANGED) {
-                val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
-                val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-                val health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, -1)
-                val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-                val voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
+    private val broadcastReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context,
+                intent: Intent,
+            ) {
+                if (intent.action == Intent.ACTION_BATTERY_CHANGED) {
+                    val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
+                    val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+                    val health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, -1)
+                    val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+                    val voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
 
-                _batteryInfo.value = BatteryInfo(
-                    temperature = temperature,
-                    isOverheated = temperature > overheatThreshold,
-                    status = getBatteryStatusString(status),
-                    health = getBatteryHealthString(health),
-                    isPluggedIn = plugged != 0,
-                    voltage = voltage / 1000.0f // Convert mV to V
-                )
+                    _batteryInfo.value =
+                        BatteryInfo(
+                            temperature = temperature,
+                            isOverheated = temperature > overheatThreshold,
+                            status = getBatteryStatusString(status),
+                            health = getBatteryHealthString(health),
+                            isPluggedIn = plugged != 0,
+                            voltage = voltage / 1000.0f, // Convert mV to V
+                        )
 
-                onTemperatureChanged?.invoke(temperature)
-                if (_batteryInfo.value.isOverheated) {
-                    onOverheatedChanged?.invoke(true, temperature)
-                    onOverheatDetected?.invoke(temperature)
+                    onTemperatureChanged?.invoke(temperature)
+                    if (_batteryInfo.value.isOverheated) {
+                        onOverheatedChanged?.invoke(true, temperature)
+                        onOverheatDetected?.invoke(temperature)
+                    }
                 }
             }
         }
-    }
 
     init {
         val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
@@ -101,5 +106,5 @@ data class BatteryInfo(
     val status: String = "",
     val health: String = "",
     val isPluggedIn: Boolean = false,
-    val voltage: Float = 0f
+    val voltage: Float = 0f,
 )
