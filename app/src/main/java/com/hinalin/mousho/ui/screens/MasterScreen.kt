@@ -3,6 +3,7 @@ package com.hinalin.mousho.ui.screens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -55,6 +58,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     var notificationEnabled by remember { mutableStateOf(false) }
     var overheatThreshold by remember { mutableStateOf(40f) }
     val batteryInfo by batteryMonitor.batteryInfo.collectAsState()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         context.dataStore.data.map { preferences ->
@@ -71,40 +75,43 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.cool_bg),
-            contentDescription = null,
-            modifier = Modifier.fillMaxWidth(),
+        ShrinkableHeaderImage(
+            imageRes = R.drawable.cool_bg,
+            scrollState = scrollState
         )
-        BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
-        StatusSection(batteryInfo)
-        HorizontalDivider()
-        SettingsSection(
-            notificationEnabled = notificationEnabled,
-            overheatThreshold = overheatThreshold,
-            onNotificationEnabledChange = { isEnabled ->
-                notificationEnabled = isEnabled
-                scope.launch {
-                    context.dataStore.edit { preferences ->
-                        preferences[NOTIFICATION_ENABLED] = isEnabled
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
+            StatusSection(batteryInfo)
+            HorizontalDivider()
+            SettingsSection(
+                notificationEnabled = notificationEnabled,
+                overheatThreshold = overheatThreshold,
+                onNotificationEnabledChange = { isEnabled ->
+                    notificationEnabled = isEnabled
+                    scope.launch {
+                        context.dataStore.edit { preferences ->
+                            preferences[NOTIFICATION_ENABLED] = isEnabled
+                        }
                     }
-                }
-            },
-            onThresholdChange = { newThreshold ->
-                overheatThreshold = newThreshold
-                scope.launch {
-                    context.dataStore.edit { preferences ->
-                        preferences[OVERHEAT_THRESHOLD] = newThreshold
+                },
+                onThresholdChange = { newThreshold ->
+                    overheatThreshold = newThreshold
+                    scope.launch {
+                        context.dataStore.edit { preferences ->
+                            preferences[OVERHEAT_THRESHOLD] = newThreshold
+                        }
                     }
-                }
-            },
-        )
-        HorizontalDivider()
-        RecordSection(batteryMonitor = batteryMonitor)
+                },
+            )
+            HorizontalDivider()
+            RecordSection(batteryMonitor = batteryMonitor)
+        }
     }
 }
 
@@ -296,4 +303,27 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             }
         }
     }
+}
+
+@Composable
+fun ShrinkableHeaderImage(
+    imageRes: Int,
+    scrollState: ScrollState
+) {
+    val maxHeight = 200.dp
+    val minHeight = 100.dp
+    val height by remember {
+        derivedStateOf {
+            maxHeight - (scrollState.value / 2f).dp.coerceAtMost(maxHeight - minHeight)
+        }
+    }
+
+    Image(
+        painter = painterResource(id = imageRes),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height),
+        contentScale = ContentScale.Crop
+    )
 }
