@@ -73,18 +73,19 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         ShrinkableHeaderImage(
             imageRes = R.drawable.cool_bg,
-            scrollState = scrollState
+            scrollState = scrollState,
         )
         Column(
             modifier = Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
             StatusSection(batteryInfo)
@@ -118,9 +119,10 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 @Composable
 fun BatteryTemperatureDisplay(temperature: Float) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -134,61 +136,69 @@ fun BatteryTemperatureDisplay(temperature: Float) {
 fun StatusSection(batteryInfo: BatteryInfo) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             StatusCard(
                 title = "Status",
                 value = batteryInfo.status,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             StatusCard(
                 title = "Health",
                 value = batteryInfo.health,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             StatusCard(
                 title = "Plugged In",
                 value = if (batteryInfo.isPluggedIn) "Yes" else "No",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             StatusCard(
                 title = "Voltage",
                 value = "${String.format("%.1f", batteryInfo.voltage)}V",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
     }
 }
 
 @Composable
-fun StatusCard(title: String, value: String, modifier: Modifier = Modifier) {
+fun StatusCard(
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
     ElevatedCard(
-        modifier = modifier.aspectRatio(1f)
+        modifier =
+            modifier
+                .aspectRatio(1f)
+                .padding(8.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }
@@ -219,9 +229,9 @@ fun NotificationSetting(
 ) {
     Row(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -278,15 +288,15 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             todayOverheatEvents.forEach { event ->
                 ElevatedCard(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                 ) {
                     Column(
                         modifier =
-                        Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
+                            Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
                     ) {
                         Text(
                             text = "Time: ${
@@ -308,7 +318,7 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
 @Composable
 fun ShrinkableHeaderImage(
     imageRes: Int,
-    scrollState: ScrollState
+    scrollState: ScrollState,
 ) {
     val maxHeight = 200.dp
     val minHeight = 100.dp
@@ -321,9 +331,10 @@ fun ShrinkableHeaderImage(
     Image(
         painter = painterResource(id = imageRes),
         contentDescription = null,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height),
-        contentScale = ContentScale.Crop
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(height),
+        contentScale = ContentScale.Crop,
     )
 }
