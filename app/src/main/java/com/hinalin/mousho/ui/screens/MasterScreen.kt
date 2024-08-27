@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -20,6 +23,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import com.hinalin.mousho.BatteryInfo
 import com.hinalin.mousho.BatteryTemperatureMonitor
 import com.hinalin.mousho.R
 import com.hinalin.mousho.dataStore
@@ -49,8 +54,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     val scope = rememberCoroutineScope()
     var notificationEnabled by remember { mutableStateOf(false) }
     var overheatThreshold by remember { mutableStateOf(40f) }
-    var currentTemperature by remember { mutableStateOf(batteryMonitor.currentTemperature) }
-    var isOverheated by remember { mutableStateOf(batteryMonitor.isOverheated) }
+    val batteryInfo by batteryMonitor.batteryInfo.collectAsState()
 
     LaunchedEffect(Unit) {
         context.dataStore.data.map { preferences ->
@@ -64,17 +68,11 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
         }
     }
 
-    batteryMonitor.onOverheatedChanged = { newIsOverheated, temperature ->
-        isOverheated = newIsOverheated
-        currentTemperature = temperature
-    }
-
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Image(
@@ -82,7 +80,8 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
             contentDescription = null,
             modifier = Modifier.fillMaxWidth(),
         )
-        BatteryTemperatureDisplay(temperature = currentTemperature)
+        BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
+        StatusSection(batteryInfo)
         HorizontalDivider()
         SettingsSection(
             notificationEnabled = notificationEnabled,
@@ -112,16 +111,79 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 @Composable
 fun BatteryTemperatureDisplay(temperature: Float) {
     Box(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = "${String.format("%.1f", temperature)}°C",
             style = MaterialTheme.typography.headlineLarge,
         )
+    }
+}
+
+@Composable
+fun StatusSection(batteryInfo: BatteryInfo) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            StatusCard(
+                title = "Status",
+                value = batteryInfo.status,
+                modifier = Modifier.weight(1f)
+            )
+            StatusCard(
+                title = "Health",
+                value = batteryInfo.health,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            StatusCard(
+                title = "Plugged In",
+                value = if (batteryInfo.isPluggedIn) "Yes" else "No",
+                modifier = Modifier.weight(1f)
+            )
+            StatusCard(
+                title = "Voltage",
+                value = "${String.format("%.1f", batteryInfo.voltage)}V",
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun StatusCard(title: String, value: String, modifier: Modifier = Modifier) {
+    ElevatedCard(
+        modifier = modifier.aspectRatio(1f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
     }
 }
 
@@ -150,9 +212,9 @@ fun NotificationSetting(
 ) {
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -209,15 +271,15 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             todayOverheatEvents.forEach { event ->
                 ElevatedCard(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                 ) {
                     Column(
                         modifier =
-                            Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
                     ) {
                         Text(
                             text = "Time: ${
