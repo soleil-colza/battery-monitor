@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -77,7 +77,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     ) {
         LottieAnimationView(isOverheated = isOverheated)
         BatteryTemperatureDisplay(temperature = currentTemperature)
-        Divider()
+        HorizontalDivider()
         SettingsSection(
             notificationEnabled = notificationEnabled,
             overheatThreshold = overheatThreshold,
@@ -98,7 +98,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
                 }
             },
         )
-        Divider()
+        HorizontalDivider()
         RecordSection(batteryMonitor = batteryMonitor)
     }
 }
