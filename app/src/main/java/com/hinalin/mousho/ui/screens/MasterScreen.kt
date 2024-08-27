@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 private val NOTIFICATION_ENABLED = booleanPreferencesKey("notification_enabled")
 private val OVERHEAT_THRESHOLD = floatPreferencesKey("overheat_threshold")
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     val context = LocalContext.current
