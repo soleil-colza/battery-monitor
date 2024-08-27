@@ -53,7 +53,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
         context.dataStore.data.map { preferences ->
             Pair(
                 preferences[NOTIFICATION_ENABLED] ?: true,
-                preferences[OVERHEAT_THRESHOLD] ?: 40f
+                preferences[OVERHEAT_THRESHOLD] ?: 40f,
             )
         }.collect { (enabled, threshold) ->
             notificationEnabled = enabled
@@ -67,11 +67,12 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     }
 
     Column(
-        modifier = Modifier
+        modifier =
+        Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         LottieAnimationView(isOverheated = isOverheated)
         BatteryTemperatureDisplay(temperature = currentTemperature)
@@ -94,7 +95,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
                         preferences[OVERHEAT_THRESHOLD] = newThreshold
                     }
                 }
-            }
+            },
         )
         Divider()
         RecordSection(batteryMonitor = batteryMonitor)
@@ -104,19 +105,21 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 @Composable
 fun BatteryTemperatureDisplay(temperature: Float) {
     ElevatedCard(
-        modifier = Modifier
+        modifier =
+        Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp),
     ) {
         Box(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = "${String.format("%.1f", temperature)}°C",
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
             )
         }
     }
@@ -127,38 +130,39 @@ fun SettingsSection(
     notificationEnabled: Boolean,
     overheatThreshold: Float,
     onNotificationEnabledChange: (Boolean) -> Unit,
-    onThresholdChange: (Float) -> Unit
+    onThresholdChange: (Float) -> Unit,
 ) {
     Text("Settings", style = MaterialTheme.typography.titleLarge)
     NotificationSetting(
         notificationEnabled = notificationEnabled,
-        onNotificationEnabledChange = onNotificationEnabledChange
+        onNotificationEnabledChange = onNotificationEnabledChange,
     )
     TemperatureThresholdSetting(
         overheatThreshold = overheatThreshold,
-        onThresholdChange = onThresholdChange
+        onThresholdChange = onThresholdChange,
     )
 }
 
 @Composable
 fun NotificationSetting(
     notificationEnabled: Boolean,
-    onNotificationEnabledChange: (Boolean) -> Unit
+    onNotificationEnabledChange: (Boolean) -> Unit,
 ) {
     Row(
-        modifier = Modifier
+        modifier =
+        Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = "Receive notifications",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
         Switch(
             checked = notificationEnabled,
-            onCheckedChange = onNotificationEnabledChange
+            onCheckedChange = onNotificationEnabledChange,
         )
     }
 }
@@ -166,24 +170,24 @@ fun NotificationSetting(
 @Composable
 fun TemperatureThresholdSetting(
     overheatThreshold: Float,
-    onThresholdChange: (Float) -> Unit
+    onThresholdChange: (Float) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
             text = "Overheat threshold",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
         Slider(
             value = overheatThreshold,
             onValueChange = { onThresholdChange(it) },
             valueRange = 30f..50f,
-            steps = 20
+            steps = 20,
         )
         Text(
             text = String.format("%.1f°C", overheatThreshold),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
@@ -198,31 +202,33 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
         Text(
             text = "No overheat today, stay cool!",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(vertical = 16.dp)
+            modifier = Modifier.padding(vertical = 16.dp),
         )
     } else {
         Column {
             todayOverheatEvents.forEach { event ->
                 ElevatedCard(
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                        .padding(vertical = 8.dp),
                 ) {
                     Column(
-                        modifier = Modifier
+                        modifier =
+                        Modifier
                             .padding(16.dp)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
                     ) {
                         Text(
-                            text = "時間: ${
+                            text = "Time: ${
                                 event.timestamp.format(
                                     java.time.format.DateTimeFormatter.ofPattern(
-                                        "HH:mm:ss"
-                                    )
+                                        "HH:mm:ss",
+                                    ),
                                 )
-                            }"
+                            }",
                         )
-                        Text(text = "温度: ${String.format("%.1f", event.temperature)}°C")
+                        Text(text = "Temperature: ${String.format("%.1f", event.temperature)}°C")
                     }
                 }
             }
