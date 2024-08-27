@@ -2,6 +2,7 @@ package com.hinalin.mousho.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,13 +28,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import com.hinalin.mousho.BatteryTemperatureMonitor
+import com.hinalin.mousho.R
 import com.hinalin.mousho.dataStore
-import com.hinalin.mousho.ui.composables.LottieAnimationView
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -69,13 +71,17 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        LottieAnimationView(isOverheated = isOverheated)
+        Image(
+            painter = painterResource(id = R.drawable.cool_bg),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth(),
+        )
         BatteryTemperatureDisplay(temperature = currentTemperature)
         HorizontalDivider()
         SettingsSection(
@@ -107,15 +113,15 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 fun BatteryTemperatureDisplay(temperature: Float) {
     ElevatedCard(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
     ) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -151,9 +157,9 @@ fun NotificationSetting(
 ) {
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -210,15 +216,15 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             todayOverheatEvents.forEach { event ->
                 ElevatedCard(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                 ) {
                     Column(
                         modifier =
-                            Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
                     ) {
                         Text(
                             text = "Time: ${
