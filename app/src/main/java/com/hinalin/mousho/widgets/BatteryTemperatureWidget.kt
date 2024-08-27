@@ -26,8 +26,8 @@ import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class BatteryTemperatureWidget : GlanceAppWidget() {
@@ -35,22 +35,29 @@ class BatteryTemperatureWidget : GlanceAppWidget() {
     private val isOverheatedFlow = MutableStateFlow(false)
     var broadcastReceiver: BroadcastReceiver? = null
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
+    override suspend fun provideGlance(
+        context: Context,
+        id: GlanceId,
+    ) {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
 
-        broadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (intent.action == Intent.ACTION_BATTERY_CHANGED) {
-                    val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
-                    val isOverheated = temperature > 40.0f // 実際の閾値設定を使用することをお勧めします
-                    temperatureFlow.value = temperature
-                    isOverheatedFlow.value = isOverheated
-                    MainScope().launch {
-                        updateWidget(context, id)
+        broadcastReceiver =
+            object : BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context,
+                    intent: Intent,
+                ) {
+                    if (intent.action == Intent.ACTION_BATTERY_CHANGED) {
+                        val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
+                        val isOverheated = temperature > 40.0f // 実際の閾値設定を使用することをお勧めします
+                        temperatureFlow.value = temperature
+                        isOverheatedFlow.value = isOverheated
+                        MainScope().launch {
+                            updateWidget(context, id)
+                        }
                     }
                 }
             }
-        }
 
         val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         context.registerReceiver(broadcastReceiver, intentFilter)
@@ -62,41 +69,52 @@ class BatteryTemperatureWidget : GlanceAppWidget() {
         }
     }
 
-    private suspend fun updateWidget(context: Context, id: GlanceId) {
+    private suspend fun updateWidget(
+        context: Context,
+        id: GlanceId,
+    ) {
         update(context, id)
     }
 }
 
 @Composable
-private fun BatteryTemperatureWidgetContent(temperature: Float, isOverheated: Boolean) {
+private fun BatteryTemperatureWidgetContent(
+    temperature: Float,
+    isOverheated: Boolean,
+) {
     Column(
-        modifier = GlanceModifier
-            .fillMaxSize()
-            .background(GlanceTheme.colors.background)
-            .padding(16.dp),
+        modifier =
+            GlanceModifier
+                .fillMaxSize()
+                .background(GlanceTheme.colors.background)
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = if (isOverheated) "Burning out!🔋" else "Comfy！🔋",
-            style = TextStyle(
-                fontWeight = FontWeight.Medium,
-                fontSize = 18.sp,
-                color = ColorProvider(
-                    day = if (isOverheated) Color.Red else Color.Green,
-                    night = if (isOverheated) Color.Red else Color.Green
-                )
-            )
+            style =
+                TextStyle(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 18.sp,
+                    color =
+                        ColorProvider(
+                            day = if (isOverheated) Color.Red else Color.Green,
+                            night = if (isOverheated) Color.Red else Color.Green,
+                        ),
+                ),
         )
         Text(
             text = "Temperature: ${String.format("%.1f", temperature)}°C",
-            style = TextStyle(
-                fontSize = 14.sp,
-                color = ColorProvider(
-                    day = Color.Black,
-                    night = Color.White
-                )
-            )
+            style =
+                TextStyle(
+                    fontSize = 14.sp,
+                    color =
+                        ColorProvider(
+                            day = Color.Black,
+                            night = Color.White,
+                        ),
+                ),
         )
     }
 }

@@ -6,13 +6,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.hinalin.mousho.data.model.OverheatEvent
 import java.time.LocalDateTime
 
 class BatteryTemperatureMonitor(private val context: Context) {
-
     var isOverheated: Boolean = false
         private set
 
@@ -27,23 +25,27 @@ class BatteryTemperatureMonitor(private val context: Context) {
 
     private val overheatEvents = mutableListOf<OverheatEvent>()
 
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_BATTERY_CHANGED) {
-                val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
-                currentTemperature = temperature
-                val wasOverheated = isOverheated
-                isOverheated = temperature > overheatThreshold
-                onTemperatureChanged?.invoke(temperature)
-                if (isOverheated != wasOverheated) {
-                    onOverheatedChanged?.invoke(isOverheated, temperature)
-                    if (isOverheated) {
-                        onOverheatDetected?.invoke(temperature)
+    private val broadcastReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context,
+                intent: Intent,
+            ) {
+                if (intent.action == Intent.ACTION_BATTERY_CHANGED) {
+                    val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
+                    currentTemperature = temperature
+                    val wasOverheated = isOverheated
+                    isOverheated = temperature > overheatThreshold
+                    onTemperatureChanged?.invoke(temperature)
+                    if (isOverheated != wasOverheated) {
+                        onOverheatedChanged?.invoke(isOverheated, temperature)
+                        if (isOverheated) {
+                            onOverheatDetected?.invoke(temperature)
+                        }
                     }
                 }
             }
         }
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getOverheatEvents(): List<OverheatEvent> {

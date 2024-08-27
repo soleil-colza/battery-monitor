@@ -9,16 +9,16 @@ import kotlinx.coroutines.withContext
 
 class BatteryTemperatureUpdateWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
+    override suspend fun doWork(): Result =
+        withContext(Dispatchers.IO) {
+            val glanceIds = GlanceAppWidgetManager(applicationContext).getGlanceIds(BatteryTemperatureWidget::class.java)
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        val glanceIds = GlanceAppWidgetManager(applicationContext).getGlanceIds(BatteryTemperatureWidget::class.java)
-        
-        glanceIds.forEach { id ->
-            BatteryTemperatureWidget().update(applicationContext, id)
+            glanceIds.forEach { id ->
+                BatteryTemperatureWidget().update(applicationContext, id)
+            }
+
+            Result.success()
         }
-
-        Result.success()
-    }
 }

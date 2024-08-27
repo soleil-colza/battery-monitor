@@ -20,18 +20,20 @@ fun RecordScreen(batteryMonitor: BatteryTemperatureMonitor) {
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(16.dp),
     ) {
         items(todayOverheatEvents) { event ->
             ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
             ) {
                 Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
+                    modifier =
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
                 ) {
                     Text(text = "Time: ${event.timestamp.format(dateFormatter)}")
                     Text(text = "Temperature: ${String.format("%.1f", event.temperature)}°C")
@@ -44,7 +46,7 @@ fun RecordScreen(batteryMonitor: BatteryTemperatureMonitor) {
                     text = "No overheat events today. Stay cool!",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(32.dp)
+                    modifier = Modifier.padding(32.dp),
                 )
             }
         }

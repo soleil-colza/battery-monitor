@@ -1,6 +1,5 @@
 package com.hinalin.mousho
 
-import com.hinalin.mousho.notification.NotificationHelper
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -15,6 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -28,37 +33,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.hinalin.mousho.ui.composables.LottieAnimationView
-import com.hinalin.mousho.ui.theme.MoushoTheme
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import java.util.concurrent.TimeUnit
-import androidx.compose.material3.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.setValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.lifecycleScope
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.hinalin.mousho.notification.NotificationHelper
+import com.hinalin.mousho.ui.composables.LottieAnimationView
+import com.hinalin.mousho.ui.screens.SettingScreen
+import com.hinalin.mousho.ui.theme.MoushoTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import androidx.lifecycle.lifecycleScope
-import com.hinalin.mousho.ui.screens.SettingScreen
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeUnit
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -66,7 +66,6 @@ private val NOTIFICATION_ENABLED = booleanPreferencesKey("notification_enabled")
 private val OVERHEAT_THRESHOLD = floatPreferencesKey("overheat_threshold")
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var batteryMonitor: BatteryTemperatureMonitor
     private lateinit var notificationHelper: NotificationHelper
 
@@ -80,7 +79,7 @@ class MainActivity : ComponentActivity() {
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    NOTIFICATION_PERMISSION_CODE
+                    NOTIFICATION_PERMISSION_CODE,
                 )
             }
         }
@@ -95,16 +94,19 @@ class MainActivity : ComponentActivity() {
         notificationHelper = NotificationHelper(this)
         batteryMonitor = BatteryTemperatureMonitor(this)
 
-        val updateRequest = PeriodicWorkRequestBuilder<BatteryTemperatureUpdateWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(Constraints.Builder()
-                .setRequiresBatteryNotLow(true)
-                .build())
-            .build()
+        val updateRequest =
+            PeriodicWorkRequestBuilder<BatteryTemperatureUpdateWorker>(15, TimeUnit.MINUTES)
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiresBatteryNotLow(true)
+                        .build(),
+                )
+                .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "BatteryTemperatureUpdate",
             ExistingPeriodicWorkPolicy.KEEP,
-            updateRequest
+            updateRequest,
         )
 
         lifecycleScope.launch {
@@ -119,7 +121,7 @@ class MainActivity : ComponentActivity() {
             MoushoTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     MainScreen(batteryMonitor)
                 }
@@ -129,9 +131,10 @@ class MainActivity : ComponentActivity() {
         batteryMonitor.onOverheatedChanged = { isOverheated, temperature ->
             if (isOverheated) {
                 runBlocking {
-                    val notificationEnabled = dataStore.data.map { preferences ->
-                        preferences[NOTIFICATION_ENABLED] ?: true
-                    }.first()
+                    val notificationEnabled =
+                        dataStore.data.map { preferences ->
+                            preferences[NOTIFICATION_ENABLED] ?: true
+                        }.first()
                     if (notificationEnabled) {
                         notificationHelper.showOverheatNotification()
                     }
@@ -164,19 +167,21 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = when (currentScreen) {
-                            0 -> if (isOverheated) "Burning hot!" else "Comfy!"
-                            1 -> "Today's Overheat Events"
-                            2 -> "Settings"
-                            else -> "Battery Monitor"
-                        },
-                        style = MaterialTheme.typography.headlineSmall
+                        text =
+                            when (currentScreen) {
+                                0 -> if (isOverheated) "Burning hot!" else "Comfy!"
+                                1 -> "Today's Overheat Events"
+                                2 -> "Settings"
+                                else -> "Battery Monitor"
+                            },
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                colors =
+                    TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
             )
         },
         bottomBar = {
@@ -190,17 +195,18 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
                     onClick = {
                         currentTemperature = batteryMonitor.getCurrentBatteryTemperature()
                         isOverheated = currentTemperature > batteryMonitor.overheatThreshold
-                    }
+                    },
                 ) {
                     Icon(Icons.Filled.Refresh, contentDescription = "Update temperature")
                 }
             }
-        }
+        },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (currentScreen) {
@@ -215,9 +221,11 @@ fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
     }
 }
 
-
 @Composable
-fun BottomNavigationBar(currentScreen: Int, onScreenChange: (Int) -> Unit) {
+fun BottomNavigationBar(
+    currentScreen: Int,
+    onScreenChange: (Int) -> Unit,
+) {
     val items = listOf("Home", "Record", "Setting")
     val icons = listOf(Icons.Filled.Home, Icons.Filled.List, Icons.Filled.Settings)
 
@@ -227,7 +235,7 @@ fun BottomNavigationBar(currentScreen: Int, onScreenChange: (Int) -> Unit) {
                 icon = { Icon(icons[index], contentDescription = item) },
                 label = { Text(item) },
                 selected = currentScreen == index,
-                onClick = { onScreenChange(index) }
+                onClick = { onScreenChange(index) },
             )
         }
     }
@@ -236,27 +244,31 @@ fun BottomNavigationBar(currentScreen: Int, onScreenChange: (Int) -> Unit) {
 @Composable
 fun BatteryTemperatureDisplay(temperature: Float) {
     ElevatedCard(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(), // Adjusted to only fill the width
-        shape = RoundedCornerShape(16.dp)
+        modifier =
+            Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+        // Adjusted to only fill the width
+        shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp), // Add padding to the content within the card
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            // Add padding to the content within the card
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center // Center content vertically
+            verticalArrangement = Arrangement.Center, // Center content vertically
         ) {
             Text(
                 text = "Current Battery Temperature",
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
             Text(
                 text = "${String.format("%.1f", temperature)}°C",
                 style = MaterialTheme.typography.headlineLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
