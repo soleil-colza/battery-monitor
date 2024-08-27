@@ -111,24 +111,17 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 
 @Composable
 fun BatteryTemperatureDisplay(temperature: Float) {
-    ElevatedCard(
+    Box(
         modifier =
         Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(16.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "${String.format("%.1f", temperature)}°C",
-                style = MaterialTheme.typography.headlineLarge,
-            )
-        }
+        Text(
+            text = "${String.format("%.1f", temperature)}°C",
+            style = MaterialTheme.typography.headlineLarge,
+        )
     }
 }
 
