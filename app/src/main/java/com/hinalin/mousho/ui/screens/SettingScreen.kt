@@ -28,7 +28,7 @@ fun SettingScreen() {
         context.dataStore.data.map { preferences ->
             Pair(
                 preferences[NOTIFICATION_ENABLED] ?: true,
-                preferences[OVERHEAT_THRESHOLD] ?: 40f
+                preferences[OVERHEAT_THRESHOLD] ?: 40f,
             )
         }.collect { (enabled, threshold) ->
             notificationEnabled = enabled
@@ -37,10 +37,11 @@ fun SettingScreen() {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         NotificationSetting(
             notificationEnabled = notificationEnabled,
@@ -51,7 +52,7 @@ fun SettingScreen() {
                         preferences[NOTIFICATION_ENABLED] = isEnabled
                     }
                 }
-            }
+            },
         )
 
         TemperatureThresholdSetting(
@@ -63,7 +64,7 @@ fun SettingScreen() {
                         preferences[OVERHEAT_THRESHOLD] = newThreshold
                     }
                 }
-            }
+            },
         )
     }
 }
@@ -71,22 +72,23 @@ fun SettingScreen() {
 @Composable
 fun NotificationSetting(
     notificationEnabled: Boolean,
-    onNotificationEnabledChange: (Boolean) -> Unit
+    onNotificationEnabledChange: (Boolean) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = "Receive notifications",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
         Switch(
             checked = notificationEnabled,
-            onCheckedChange = onNotificationEnabledChange
+            onCheckedChange = onNotificationEnabledChange,
         )
     }
 }
@@ -94,24 +96,24 @@ fun NotificationSetting(
 @Composable
 fun TemperatureThresholdSetting(
     overheatThreshold: Float,
-    onThresholdChange: (Float) -> Unit
+    onThresholdChange: (Float) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
             text = "Overheat threshold temperature",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
         Slider(
             value = overheatThreshold,
             onValueChange = { onThresholdChange(it) },
             valueRange = 30f..50f,
-            steps = 20
+            steps = 20,
         )
         Text(
             text = String.format("%.1f°C", overheatThreshold),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

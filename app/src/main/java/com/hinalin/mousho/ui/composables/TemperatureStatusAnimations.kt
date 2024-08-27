@@ -26,7 +26,7 @@ fun IsOverheatedAnimation() {
     LottieAnimation(
         composition,
         iterations = LottieConstants.IterateForever,
-        modifier = Modifier.size(400.dp)
+        modifier = Modifier.size(400.dp),
     )
 }
 
@@ -36,6 +36,6 @@ fun IsCoolEnoughAnimation() {
     LottieAnimation(
         composition,
         iterations = LottieConstants.IterateForever,
-        modifier = Modifier.size(500.dp)
+        modifier = Modifier.size(500.dp),
     )
 }
