@@ -172,7 +172,9 @@ fun StatusSection(batteryInfo: BatteryInfo) {
 @Composable
 fun StatusCard(title: String, value: String, modifier: Modifier = Modifier) {
     ElevatedCard(
-        modifier = modifier.aspectRatio(1f)
+        modifier = modifier
+            .aspectRatio(1f)
+            .padding(8.dp)
     ) {
         Column(
             modifier = Modifier
