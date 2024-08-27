@@ -71,10 +71,10 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 
     Column(
         modifier =
-        Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Image(
@@ -111,24 +111,17 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 
 @Composable
 fun BatteryTemperatureDisplay(temperature: Float) {
-    ElevatedCard(
+    Box(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-    ) {
-        Box(
-            modifier =
             Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "${String.format("%.1f", temperature)}°C",
-                style = MaterialTheme.typography.headlineLarge,
-            )
-        }
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "${String.format("%.1f", temperature)}°C",
+            style = MaterialTheme.typography.headlineLarge,
+        )
     }
 }
 
@@ -157,9 +150,9 @@ fun NotificationSetting(
 ) {
     Row(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -216,15 +209,15 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             todayOverheatEvents.forEach { event ->
                 ElevatedCard(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                 ) {
                     Column(
                         modifier =
-                        Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
+                            Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
                     ) {
                         Text(
                             text = "Time: ${
