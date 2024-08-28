@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hinalin.mousho.BatteryTemperatureMonitor
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
@@ -34,15 +33,15 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             todayOverheatEvents.forEach { event ->
                 ElevatedCard(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                 ) {
                     Column(
                         modifier =
-                        Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
+                            Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
                     ) {
                         Text(
                             text = "Time: ${
