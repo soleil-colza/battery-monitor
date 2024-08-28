@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ShrinkableHeaderImage(
-    imageRes: Int,
+    hotImageRes: Int,
+    coolImageRes: Int,
+    isOverheated: Boolean,
     scrollState: ScrollState,
     maxHeight: Dp,
     minHeight: Dp,
@@ -27,13 +29,14 @@ fun ShrinkableHeaderImage(
         }
     }
 
+    val imageRes = if (isOverheated) hotImageRes else coolImageRes
+
     Image(
         painter = painterResource(id = imageRes),
         contentDescription = null,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(height),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height),
         contentScale = ContentScale.Crop,
     )
 }

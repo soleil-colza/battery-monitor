@@ -78,7 +78,9 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
                     .verticalScroll(scrollState),
         ) {
             ShrinkableHeaderImage(
-                imageRes = R.drawable.cool_bg,
+                hotImageRes = R.drawable.hot_bg,
+                coolImageRes = R.drawable.cool_bg,
+                isOverheated = batteryInfo.isOverheated,
                 scrollState = scrollState,
                 maxHeight = screenHeight * 0.3f,
                 minHeight = screenHeight * 0.1f,
