@@ -1,4 +1,4 @@
-package com.hinalin.mousho.ui.composables
+package com.hinalin.mousho.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
