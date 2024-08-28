@@ -1,7 +1,7 @@
 [versions]
 datastorePreferences = "1.1.1"
 glance = "1.1.0"
-kotlin = "2.0.10"
+kotlin = "2.0.20"
 agp = "8.5.2"
 coreKtx = "1.13.1"
 junit = "4.13.2"
