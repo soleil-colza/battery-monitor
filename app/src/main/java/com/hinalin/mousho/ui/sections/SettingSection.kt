@@ -3,8 +3,8 @@ package com.hinalin.mousho.ui.sections
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.hinalin.mousho.ui.components.NotificationSetting
 import com.hinalin.mousho.ui.components.TemperatureThresholdSetting
-import com.hinalin.mousho.ui.screens.NotificationSetting
 
 @Composable
 fun SettingSection(

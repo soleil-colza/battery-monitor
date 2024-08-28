@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 fun BatteryTemperatureDisplay(temperature: Float) {
     Box(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(

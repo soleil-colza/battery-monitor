@@ -23,15 +23,15 @@ fun StatusCard(
 ) {
     ElevatedCard(
         modifier =
-        modifier
-            .aspectRatio(1f)
-            .padding(8.dp),
+            modifier
+                .aspectRatio(1f)
+                .padding(8.dp),
     ) {
         Column(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+                Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

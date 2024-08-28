@@ -73,9 +73,9 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 
         Column(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState),
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
         ) {
             ShrinkableHeaderImage(
                 imageRes = R.drawable.cool_bg,
@@ -85,18 +85,18 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
             )
             Column(
                 modifier =
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(
-                        top =
-                        WindowInsets.statusBars
-                            .asPaddingValues()
-                            .calculateTopPadding(),
-                        bottom =
-                        WindowInsets.navigationBars
-                            .asPaddingValues()
-                            .calculateBottomPadding(),
-                    ),
+                    Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(
+                            top =
+                                WindowInsets.statusBars
+                                    .asPaddingValues()
+                                    .calculateTopPadding(),
+                            bottom =
+                                WindowInsets.navigationBars
+                                    .asPaddingValues()
+                                    .calculateBottomPadding(),
+                        ),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
