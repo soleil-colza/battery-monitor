@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedCard
@@ -72,46 +76,61 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
         }
     }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+    Box(
+        modifier = Modifier.fillMaxSize(),
     ) {
-        ShrinkableHeaderImage(
-            imageRes = R.drawable.cool_bg,
-            scrollState = scrollState,
-        )
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
         ) {
-            BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
-            StatusSection(batteryInfo)
-            HorizontalDivider()
-            SettingsSection(
-                notificationEnabled = notificationEnabled,
-                overheatThreshold = overheatThreshold,
-                onNotificationEnabledChange = { isEnabled ->
-                    notificationEnabled = isEnabled
-                    scope.launch {
-                        context.dataStore.edit { preferences ->
-                            preferences[NOTIFICATION_ENABLED] = isEnabled
-                        }
-                    }
-                },
-                onThresholdChange = { newThreshold ->
-                    overheatThreshold = newThreshold
-                    scope.launch {
-                        context.dataStore.edit { preferences ->
-                            preferences[OVERHEAT_THRESHOLD] = newThreshold
-                        }
-                    }
-                },
+            ShrinkableHeaderImage(
+                imageRes = R.drawable.cool_bg,
+                scrollState = scrollState,
             )
-            HorizontalDivider()
-            RecordSection(batteryMonitor = batteryMonitor)
+            Column(
+                modifier =
+                    Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(
+                            top =
+                                WindowInsets.statusBars
+                                    .asPaddingValues()
+                                    .calculateTopPadding(),
+                            bottom =
+                                WindowInsets.navigationBars
+                                    .asPaddingValues()
+                                    .calculateBottomPadding(),
+                        ),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
+                StatusSection(batteryInfo)
+                HorizontalDivider()
+                SettingsSection(
+                    notificationEnabled = notificationEnabled,
+                    overheatThreshold = overheatThreshold,
+                    onNotificationEnabledChange = { isEnabled ->
+                        notificationEnabled = isEnabled
+                        scope.launch {
+                            context.dataStore.edit { preferences ->
+                                preferences[NOTIFICATION_ENABLED] = isEnabled
+                            }
+                        }
+                    },
+                    onThresholdChange = { newThreshold ->
+                        overheatThreshold = newThreshold
+                        scope.launch {
+                            context.dataStore.edit { preferences ->
+                                preferences[OVERHEAT_THRESHOLD] = newThreshold
+                            }
+                        }
+                    },
+                )
+                HorizontalDivider()
+                RecordSection(batteryMonitor = batteryMonitor)
+            }
         }
     }
 }
@@ -320,7 +339,7 @@ fun ShrinkableHeaderImage(
     imageRes: Int,
     scrollState: ScrollState,
 ) {
-    val maxHeight = 200.dp
+    val maxHeight = 300.dp
     val minHeight = 100.dp
     val height by remember {
         derivedStateOf {
