@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -76,9 +78,13 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier.fillMaxSize(),
     ) {
+        val screenWidth = maxWidth
+        val screenHeight = maxHeight
+        val isPortrait = screenHeight > screenWidth
+
         Column(
             modifier =
                 Modifier
@@ -88,6 +94,8 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
             ShrinkableHeaderImage(
                 imageRes = R.drawable.cool_bg,
                 scrollState = scrollState,
+                maxHeight = screenHeight * 0.3f,
+                minHeight = screenHeight * 0.1f,
             )
             Column(
                 modifier =
@@ -106,7 +114,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
-                StatusSection(batteryInfo)
+                StatusSection(batteryInfo, isPortrait)
                 HorizontalDivider()
                 SettingsSection(
                     notificationEnabled = notificationEnabled,
@@ -152,11 +160,47 @@ fun BatteryTemperatureDisplay(temperature: Float) {
 }
 
 @Composable
-fun StatusSection(batteryInfo: BatteryInfo) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
+fun StatusSection(
+    batteryInfo: BatteryInfo,
+    isPortrait: Boolean,
+) {
+    if (isPortrait) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                StatusCard(
+                    title = "Status",
+                    value = batteryInfo.status,
+                    modifier = Modifier.weight(1f),
+                )
+                StatusCard(
+                    title = "Health",
+                    value = batteryInfo.health,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                StatusCard(
+                    title = "Plugged In",
+                    value = if (batteryInfo.isPluggedIn) "Yes" else "No",
+                    modifier = Modifier.weight(1f),
+                )
+                StatusCard(
+                    title = "Voltage",
+                    value = "${String.format("%.1f", batteryInfo.voltage)}V",
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    } else {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -171,11 +215,6 @@ fun StatusSection(batteryInfo: BatteryInfo) {
                 value = batteryInfo.health,
                 modifier = Modifier.weight(1f),
             )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
             StatusCard(
                 title = "Plugged In",
                 value = if (batteryInfo.isPluggedIn) "Yes" else "No",
@@ -338,9 +377,9 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
 fun ShrinkableHeaderImage(
     imageRes: Int,
     scrollState: ScrollState,
+    maxHeight: Dp,
+    minHeight: Dp,
 ) {
-    val maxHeight = 300.dp
-    val minHeight = 100.dp
     val height by remember {
         derivedStateOf {
             maxHeight - (scrollState.value / 2f).dp.coerceAtMost(maxHeight - minHeight)
