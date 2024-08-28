@@ -24,12 +24,10 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -39,7 +37,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -80,28 +77,32 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
         ) {
             ShrinkableHeaderImage(
                 imageRes = R.drawable.cool_bg,
                 scrollState = scrollState,
             )
             Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(
-                        top = WindowInsets.statusBars
-                            .asPaddingValues()
-                            .calculateTopPadding(),
-                        bottom = WindowInsets.navigationBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                    ),
+                modifier =
+                    Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(
+                            top =
+                                WindowInsets.statusBars
+                                    .asPaddingValues()
+                                    .calculateTopPadding(),
+                            bottom =
+                                WindowInsets.navigationBars
+                                    .asPaddingValues()
+                                    .calculateBottomPadding(),
+                        ),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
@@ -138,9 +139,9 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
 fun BatteryTemperatureDisplay(temperature: Float) {
     Box(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -197,15 +198,15 @@ fun StatusCard(
 ) {
     ElevatedCard(
         modifier =
-        modifier
-            .aspectRatio(1f)
-            .padding(8.dp),
+            modifier
+                .aspectRatio(1f)
+                .padding(8.dp),
     ) {
         Column(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+                Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -247,9 +248,9 @@ fun NotificationSetting(
 ) {
     Row(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -306,15 +307,15 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             todayOverheatEvents.forEach { event ->
                 ElevatedCard(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                 ) {
                     Column(
                         modifier =
-                        Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
+                            Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
                     ) {
                         Text(
                             text = "Time: ${
@@ -349,9 +350,10 @@ fun ShrinkableHeaderImage(
     Image(
         painter = painterResource(id = imageRes),
         contentDescription = null,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(height),
         contentScale = ContentScale.Crop,
     )
 }
