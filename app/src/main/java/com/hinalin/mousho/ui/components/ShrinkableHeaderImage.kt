@@ -34,9 +34,10 @@ fun ShrinkableHeaderImage(
     Image(
         painter = painterResource(id = imageRes),
         contentDescription = null,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(height),
         contentScale = ContentScale.Crop,
     )
 }
