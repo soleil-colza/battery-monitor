@@ -19,7 +19,12 @@ import com.hinalin.mousho.ui.components.OverheatEventCard
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
-    Text("Today's overheat record", style = MaterialTheme.typography.titleLarge)
+    Text(
+        text = "Today's overheat record",
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(vertical = 8.dp),
+    )
+
     val todayOverheatEvents by remember { mutableStateOf(batteryMonitor.getTodayOverheatEvents()) }
 
     if (todayOverheatEvents.isEmpty()) {
