@@ -21,7 +21,7 @@ fun SettingSection(
     Text(
         text = "Settings",
         style = MaterialTheme.typography.titleLarge,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier.padding(vertical = 8.dp),
     )
 
     Spacer(modifier = Modifier.height(16.dp))

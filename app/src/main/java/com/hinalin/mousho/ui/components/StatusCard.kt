@@ -26,15 +26,15 @@ fun StatusCard(
 ) {
     ElevatedCard(
         modifier =
-        modifier
-            .aspectRatio(1f)
-            .padding(8.dp),
+            modifier
+                .aspectRatio(1f)
+                .padding(8.dp),
     ) {
         Column(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+                Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -44,16 +44,18 @@ fun StatusCard(
             )
             Spacer(modifier = Modifier.height(16.dp))
             when (value) {
-                is String -> Text(
-                    text = value,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+                is String ->
+                    Text(
+                        text = value,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
 
-                is ImageVector -> Icon(
-                    imageVector = value,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
+                is ImageVector ->
+                    Icon(
+                        imageVector = value,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                    )
             }
         }
     }

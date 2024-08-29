@@ -44,10 +44,11 @@ fun StatusSection(
             ) {
                 StatusCard(
                     title = "Outlet",
-                    value = when {
-                        batteryInfo.isPluggedIn -> Icons.Filled.Power
-                        else -> Icons.Filled.PowerOff
-                    },
+                    value =
+                        when {
+                            batteryInfo.isPluggedIn -> Icons.Filled.Power
+                            else -> Icons.Filled.PowerOff
+                        },
                     modifier = Modifier.weight(1f),
                 )
                 StatusCard(
