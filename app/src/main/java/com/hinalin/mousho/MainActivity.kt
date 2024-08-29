@@ -11,7 +11,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,7 +25,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.hinalin.mousho.notification.NotificationHelper
-import com.hinalin.mousho.ui.screens.MasterScreen
+import com.hinalin.mousho.ui.screens.HomeScreen
 import com.hinalin.mousho.ui.theme.MoushoTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -97,7 +96,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    MainScreen(batteryMonitor)
+                    HomeScreen(batteryMonitor)
                 }
             }
         }
@@ -121,10 +120,4 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         batteryMonitor.stopMonitoring()
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun MainScreen(batteryMonitor: BatteryTemperatureMonitor) {
-    MasterScreen(batteryMonitor)
 }

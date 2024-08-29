@@ -16,7 +16,7 @@ fun BatteryTemperatureDisplay(temperature: Float) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(32.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(

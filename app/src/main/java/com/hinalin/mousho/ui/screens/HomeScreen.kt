@@ -5,9 +5,11 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -44,7 +46,7 @@ private val OVERHEAT_THRESHOLD = floatPreferencesKey("overheat_threshold")
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
+fun HomeScreen(batteryMonitor: BatteryTemperatureMonitor) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var notificationEnabled by remember { mutableStateOf(false) }
@@ -126,6 +128,7 @@ fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
                 )
                 HorizontalDivider()
                 RecordSection(batteryMonitor = batteryMonitor)
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
