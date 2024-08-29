@@ -44,7 +44,7 @@ private val OVERHEAT_THRESHOLD = floatPreferencesKey("overheat_threshold")
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MasterScreen(batteryMonitor: BatteryTemperatureMonitor) {
+fun HomeScreen(batteryMonitor: BatteryTemperatureMonitor) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var notificationEnabled by remember { mutableStateOf(false) }
