@@ -33,8 +33,11 @@ fun StatusSection(
                     modifier = Modifier.weight(1f),
                 )
                 StatusCard(
-                    title = "Health",
-                    value = batteryInfo.health,
+                    title = "Cycle Count",
+                    value = if (batteryInfo.cycleCount != -1)
+                        batteryInfo.cycleCount.toString()
+                    else
+                        "This feature is not available for this device.",
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -45,10 +48,10 @@ fun StatusSection(
                 StatusCard(
                     title = "Outlet",
                     value =
-                        when {
-                            batteryInfo.isPluggedIn -> Icons.Filled.Power
-                            else -> Icons.Filled.PowerOff
-                        },
+                    when {
+                        batteryInfo.isPluggedIn -> Icons.Filled.Power
+                        else -> Icons.Filled.PowerOff
+                    },
                     modifier = Modifier.weight(1f),
                 )
                 StatusCard(
@@ -69,8 +72,11 @@ fun StatusSection(
                 modifier = Modifier.weight(1f),
             )
             StatusCard(
-                title = "Health",
-                value = batteryInfo.health,
+                title = "Cycle Count",
+                value = if (batteryInfo.cycleCount != -1)
+                    batteryInfo.cycleCount
+                else
+                    "This feature is not available for this device.",
                 modifier = Modifier.weight(1f),
             )
             StatusCard(

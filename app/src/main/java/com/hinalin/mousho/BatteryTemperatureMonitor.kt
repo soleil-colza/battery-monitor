@@ -33,7 +33,7 @@ class BatteryTemperatureMonitor(private val context: Context) {
                 if (intent.action == Intent.ACTION_BATTERY_CHANGED) {
                     val temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f
                     val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-                    val health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, -1)
+                    val cycleCount = intent.getIntExtra(BatteryManager.EXTRA_CYCLE_COUNT, -1)
                     val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
                     val voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
 
@@ -42,7 +42,7 @@ class BatteryTemperatureMonitor(private val context: Context) {
                             temperature = temperature,
                             isOverheated = temperature > overheatThreshold,
                             status = getBatteryStatusString(status),
-                            health = getBatteryHealthString(health),
+                            cycleCount = cycleCount,
                             isPluggedIn = plugged != 0,
                             voltage = voltage / 1000.0f, // Convert mV to V
                         )
@@ -104,7 +104,7 @@ data class BatteryInfo(
     val temperature: Float = 0f,
     val isOverheated: Boolean = false,
     val status: String = "",
-    val health: String = "",
+    val cycleCount: Int = -1,
     val isPluggedIn: Boolean = false,
     val voltage: Float = 0f,
 )

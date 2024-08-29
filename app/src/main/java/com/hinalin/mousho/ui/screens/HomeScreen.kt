@@ -5,9 +5,11 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -73,9 +75,9 @@ fun HomeScreen(batteryMonitor: BatteryTemperatureMonitor) {
 
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState),
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
         ) {
             ShrinkableHeaderImage(
                 hotImageRes = R.drawable.hot_bg,
@@ -87,18 +89,18 @@ fun HomeScreen(batteryMonitor: BatteryTemperatureMonitor) {
             )
             Column(
                 modifier =
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(
-                            top =
-                                WindowInsets.statusBars
-                                    .asPaddingValues()
-                                    .calculateTopPadding(),
-                            bottom =
-                                WindowInsets.navigationBars
-                                    .asPaddingValues()
-                                    .calculateBottomPadding(),
-                        ),
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(
+                        top =
+                        WindowInsets.statusBars
+                            .asPaddingValues()
+                            .calculateTopPadding(),
+                        bottom =
+                        WindowInsets.navigationBars
+                            .asPaddingValues()
+                            .calculateBottomPadding(),
+                    ),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 BatteryTemperatureDisplay(temperature = batteryInfo.temperature)
@@ -126,6 +128,7 @@ fun HomeScreen(batteryMonitor: BatteryTemperatureMonitor) {
                 )
                 HorizontalDivider()
                 RecordSection(batteryMonitor = batteryMonitor)
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
