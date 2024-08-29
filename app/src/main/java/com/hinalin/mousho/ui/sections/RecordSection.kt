@@ -2,10 +2,9 @@ package com.hinalin.mousho.ui.sections
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hinalin.mousho.BatteryTemperatureMonitor
+import com.hinalin.mousho.ui.components.OverheatEventCard
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -29,32 +29,9 @@ fun RecordSection(batteryMonitor: BatteryTemperatureMonitor) {
             modifier = Modifier.padding(vertical = 16.dp),
         )
     } else {
-        Column {
-            todayOverheatEvents.forEach { event ->
-                ElevatedCard(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                ) {
-                    Column(
-                        modifier =
-                            Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = "Time: ${
-                                event.timestamp.format(
-                                    java.time.format.DateTimeFormatter.ofPattern(
-                                        "HH:mm:ss",
-                                    ),
-                                )
-                            }",
-                        )
-                        Text(text = "Temperature: ${String.format("%.1f", event.temperature)}°C")
-                    }
-                }
+        LazyColumn {
+            items(todayOverheatEvents) { event ->
+                OverheatEventCard(event)
             }
         }
     }
