@@ -37,81 +37,85 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun OverheatEventCard(event: OverheatEvent) {
     val temperature = event.temperature
-    val color = remember(temperature) {
-        when {
-            temperature >= 45f -> Color(0xFFFF5252)
-            temperature >= 42f -> Color(0xFFFFAB40)
-            else -> Color(0xFFFFD740)
+    val color =
+        remember(temperature) {
+            when {
+                temperature >= 45f -> Color(0xFFFF5252)
+                temperature >= 42f -> Color(0xFFFFAB40)
+                else -> Color(0xFFFFD740)
+            }
         }
-    }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .alpha(0.7f)
-            .animateContentSize(),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .alpha(0.7f)
+                .animateContentSize(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = color,
-            contentColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors =
+            CardDefaults.cardColors(
+                containerColor = color,
+                contentColor = Color.White,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             Icon(
                 imageVector = Icons.Filled.Warning,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(40.dp),
             )
             Text(
                 text = "${String.format("%.1f", event.temperature)}°C",
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color.White
+                color = Color.White,
             )
             Text(
                 text = "${event.timestamp.format(DateTimeFormatter.ofPattern("HH:mm:ss"))}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
+                color = Color.White,
             )
         }
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
 fun OverheatEventCardPreview() {
-    val sampleEvents = listOf(
-        OverheatEvent(
-            timestamp = LocalDateTime.of(2023, 7, 1, 14, 30),
-            temperature = 46.8f
-        ),
-        OverheatEvent(
-            timestamp = LocalDateTime.of(2023, 7, 1, 15, 45),
-            temperature = 43.2f
-        ),
-        OverheatEvent(
-            timestamp = LocalDateTime.of(2023, 7, 1, 16, 15),
-            temperature = 41.5f
-        ),
-        OverheatEvent(
-            timestamp = LocalDateTime.of(2023, 7, 1, 17, 0),
-            temperature = 39.9f
-        ),
-        OverheatEvent(
-            timestamp = LocalDateTime.of(2023, 7, 1, 18, 30),
-            temperature = 48.5f
+    val sampleEvents =
+        listOf(
+            OverheatEvent(
+                timestamp = LocalDateTime.of(2023, 7, 1, 14, 30),
+                temperature = 46.8f,
+            ),
+            OverheatEvent(
+                timestamp = LocalDateTime.of(2023, 7, 1, 15, 45),
+                temperature = 43.2f,
+            ),
+            OverheatEvent(
+                timestamp = LocalDateTime.of(2023, 7, 1, 16, 15),
+                temperature = 41.5f,
+            ),
+            OverheatEvent(
+                timestamp = LocalDateTime.of(2023, 7, 1, 17, 0),
+                temperature = 39.9f,
+            ),
+            OverheatEvent(
+                timestamp = LocalDateTime.of(2023, 7, 1, 18, 30),
+                temperature = 48.5f,
+            ),
         )
-    )
 
     MoushoTheme {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
