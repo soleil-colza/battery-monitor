@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Power
+import androidx.compose.material.icons.filled.PowerOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,8 +43,12 @@ fun StatusSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 StatusCard(
-                    title = "Plugged In",
-                    value = if (batteryInfo.isPluggedIn) "Yes" else "No",
+                    title = "Outlet",
+                    value =
+                        when {
+                            batteryInfo.isPluggedIn -> Icons.Filled.Power
+                            else -> Icons.Filled.PowerOff
+                        },
                     modifier = Modifier.weight(1f),
                 )
                 StatusCard(
